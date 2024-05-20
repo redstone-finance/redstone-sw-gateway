@@ -163,6 +163,7 @@ export interface GatewayContext {
   app.context.appSync = appSync;
   app.context.signatureVerification = new EvmSignatureVerificationServerPlugin();
   app.context.replica = replica;
+  app.context.env = env as EnvType;
 
   app.use(errorHandlerMiddleware);
   app.use(accessLogMiddleware);

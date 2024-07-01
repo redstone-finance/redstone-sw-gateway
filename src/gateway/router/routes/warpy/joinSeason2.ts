@@ -32,11 +32,11 @@ export async function joinSeason2(ctx: Router.RouterContext) {
     select * from registration_table left join joined_table_res on true;`
   );
 
-  const { id, joined, timestamp } = result.rows[0];
+  const joinSeason2Result = result.rows[0];
   ctx.body = {
-    id,
-    joined,
-    timestamp,
+    id: joinSeason2Result?.id,
+    joined: joinSeason2Result?.joined,
+    timestamp: joinSeason2Result?.timestamp,
   };
 
   logger.debug(`User's registration date loaded in ${benchmark.elapsed()}`);

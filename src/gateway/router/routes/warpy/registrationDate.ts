@@ -21,7 +21,9 @@ export async function registrationDate(ctx: Router.RouterContext) {
     bindings
   );
 
-  ctx.body = result.rows[0]?.sync_timestamp;
+  ctx.body = {
+    date: result.rows[0]?.sync_timestamp,
+  };
 
   logger.debug(`User's registration date loaded in ${benchmark.elapsed()}`);
 }

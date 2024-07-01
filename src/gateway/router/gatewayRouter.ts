@@ -7,7 +7,7 @@ import { contractRoute } from './routes/contracts/contractRoute';
 import { contractWithSourceRoute } from './routes/contracts/contractWithSourceRoute';
 import { contractWithSourceRoute_v2 } from './routes/contracts/contractWithSourceRoute_v2';
 import { interactionRoute } from './routes/interactions/interactionRoute';
-import { sequencerAddressRoute } from './routes/sequencerAddress'
+import { sequencerAddressRoute } from './routes/sequencerAddress';
 import { sequencerRoute } from './routes/sequencerRoute';
 import { sequencerRoute_v2 } from './routes/sequencerRoute_v2';
 import { interactionsStreamRoute } from './routes/interactions/interactionsStreamRoute';
@@ -31,6 +31,7 @@ import { registerContractRoute } from './routes/deploy/registerContractRoute';
 import { dashboardRoute } from './routes/dashboardRoute';
 import { gcpAliveRoute } from './routes/gcpAliveRoute';
 import { contractsByTags } from './routes/contracts/contractsByTags';
+import { registrationDate } from './routes/warpy/registrationDate';
 
 const gatewayRouter = (replica: boolean): Router => {
   const router = new Router({ prefix: '/gateway' });
@@ -61,8 +62,9 @@ const gatewayRouter = (replica: boolean): Router => {
   router.get('/contracts-by-source', contractsBySourceRoute);
   router.get('/creator', creatorRoute);
   router.get('/gcp/alive', gcpAliveRoute);
-  router.get('/sequencer/address', sequencerAddressRoute)
+  router.get('/sequencer/address', sequencerAddressRoute);
   router.get('/contracts-by-tags', contractsByTags);
+  router.get('/warpy/registration-date', registrationDate);
 
   // post
   if (!replica) {

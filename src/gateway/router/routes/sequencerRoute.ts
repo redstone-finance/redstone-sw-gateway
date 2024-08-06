@@ -17,7 +17,7 @@ import { Knex } from 'knex';
 import { GatewayError } from '../../errorHandlerMiddleware';
 import { VRF } from '../../init';
 import { DataItem, serializeTags } from 'arbundles';
-import Irys from "@irys/sdk";
+import Irys from '@irys/sdk';
 const { Evaluate } = require('@idena/vrf-js');
 
 export type VrfData = {
@@ -436,19 +436,30 @@ export async function createSortKey(
 }
 
 export function checkWhitelistedWallet(walletAddr: string, contractTxId: string) {
-  if (contractTxId === 'p5OI99-BaY4QbZts266T7EDwofZqs-wVuYJmMCS0SUU'
-  && walletAddr !== 'jnioZFibZSCcV8o-HkBXYPYEYNib4tqfexP0kCBXX_M') {
+  if (
+    contractTxId === 'p5OI99-BaY4QbZts266T7EDwofZqs-wVuYJmMCS0SUU' &&
+    walletAddr !== 'jnioZFibZSCcV8o-HkBXYPYEYNib4tqfexP0kCBXX_M' &&
+    walletAddr !== 'ESCLmn6txFGgK-XO2U6svB1543n2SoGTB29Aptnj9v0'
+  ) {
     throw new Error(`Wallet blacklisted: ${walletAddr}`);
   }
 }
 
 export function checkBlacklistedFunction(functionName: string, contractTxId: string) {
   const blacklistedFunctions: string[] = [
-    "getAddress", "getCounter", "balance", "getBoost", "getRoulettePick", "getRouletteSwitch", "getRanking"
+    'getAddress',
+    'getCounter',
+    'balance',
+    'getBoost',
+    'getRoulettePick',
+    'getRouletteSwitch',
+    'getRanking',
   ];
 
-  if (contractTxId === 'p5OI99-BaY4QbZts266T7EDwofZqs-wVuYJmMCS0SUU'
-   && blacklistedFunctions.includes(functionName?.trim())) {
+  if (
+    contractTxId === 'p5OI99-BaY4QbZts266T7EDwofZqs-wVuYJmMCS0SUU' &&
+    blacklistedFunctions.includes(functionName?.trim())
+  ) {
     throw new Error(`"View" function blacklisted: ${functionName}`);
   }
 }

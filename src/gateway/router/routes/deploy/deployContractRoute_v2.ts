@@ -1,5 +1,5 @@
 import Router from '@koa/router';
-import { BUNDLR_NODE1_URL } from '../../../../constants';
+import { BUNDLR_NODE1_URL, TURBO_UPLOAD_URL } from '../../../../constants';
 import { Bundle, DataItem } from 'arbundles';
 import { SMART_WEAVE_TAGS, Tags, WARP_TAGS } from 'warp-contracts';
 import { getCachedNetworkData } from '../../../tasks/networkInfoCache';
@@ -76,14 +76,14 @@ export async function deployContractRoute_v2(ctx: Router.RouterContext) {
     logger.debug('Contract successfully uploaded to Bundlr.', {
       contract_id: contractDataItem.id,
       src_id: srcDataItem?.id,
-      bundled_tx_id: bundlrResponse.data.id,
+      bundled_tx_id: bundlrResponse.id,
     });
 
     if (srcDataItem) {
       contracts_src_insert = {
         ...contracts_src_insert,
-        bundler_response: JSON.stringify(bundlrResponse?.data),
-        bundler_src_tx_id: bundlrResponse.data.id,
+        bundler_response: JSON.stringify(bundlrResponse),
+        bundler_src_tx_id: bundlrResponse.id,
       };
       await dbSource.insertContractSource(contracts_src_insert);
     }
@@ -116,7 +116,7 @@ export async function deployContractRoute_v2(ctx: Router.RouterContext) {
       block_timestamp: blockTimestamp,
       content_type: contentType,
       contract_tx: { tags: contractDataItem.toJSON().tags },
-      bundler_contract_tx_id: bundlrResponse.data.id,
+      bundler_contract_tx_id: bundlrResponse.id,
       bundler_contract_node: BUNDLR_NODE1_URL,
       testnet,
       deployment_type: WarpDeployment.Direct,
@@ -142,13 +142,13 @@ export async function deployContractRoute_v2(ctx: Router.RouterContext) {
     logger.info('Contract successfully deployed.', {
       contractTxId: contractDataItem.id,
       srcTxId: srcDataItem?.id || srcId,
-      bundlrTxId: bundlrResponse?.data.id,
+      bundlrTxId: bundlrResponse?.id,
     });
 
     ctx.body = {
       contractTxId: contractDataItem.id,
       srcTxId: srcDataItem?.id || srcId,
-      bundlrTxId: bundlrResponse.data.id,
+      bundlrTxId: bundlrResponse?.id,
     };
   } catch (e: any) {
     throw new GatewayError(`Error while inserting bundled transaction: ${e}.`, 500, {
@@ -216,13 +216,16 @@ export async function bundleAndUpload(
     ],
   });
   await bundlrTx.sign();
-  const bundlrResponse = await bundlr.uploader.uploadTransaction(bundlrTx, { getReceiptSignature: true });
-  if (
-    bundlrResponse.status !== 200 ||
-    !bundlrResponse.data.public ||
-    !bundlrResponse.data.signature ||
-    !bundlrResponse.data.block
-  ) {
+  const bundlrResponse = await fetch(`${TURBO_UPLOAD_URL}/tx`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/octet-stream',
+      Accept: 'application/json',
+    },
+    body: bundlrTx.getRaw(),
+  }).then((res) => res.json());
+
+  if (bundlrResponse.status !== 200 || !bundlrResponse.public || !bundlrResponse.signature) {
     throw new Error(
       `Bundlr did not upload transaction correctly. Bundlr responded with status ${bundlrResponse.status}.`
     );

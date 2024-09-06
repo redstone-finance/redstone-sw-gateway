@@ -44,7 +44,7 @@ export async function deploySourceRoute_v2(ctx: Router.RouterContext) {
     }
     const bundlrResponse = await bundleAndUpload({ contract: null, src: dataItem }, ctx);
 
-    bundlrSrcTxId = bundlrResponse.data.id;
+    bundlrSrcTxId = bundlrResponse?.id;
     srcBundlrResponse = bundlrResponse;
     logger.debug('Contract source successfully uploaded to Bundlr.', {
       id: srcId,
@@ -59,7 +59,7 @@ export async function deploySourceRoute_v2(ctx: Router.RouterContext) {
       src_wasm_lang: srcWasmLang || null,
       bundler_src_tx_id: bundlrSrcTxId,
       bundler_src_node: BUNDLR_NODE1_URL,
-      bundler_response: JSON.stringify(srcBundlrResponse.data),
+      bundler_response: JSON.stringify(srcBundlrResponse),
       src_tx: dataItem.toJSON(),
       testnet: srcTestnet,
       deployment_type: WarpDeployment.Direct,

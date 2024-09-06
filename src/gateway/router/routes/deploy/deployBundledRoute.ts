@@ -8,7 +8,7 @@ import { evalManifest, WarpDeployment } from './deployContractRoute';
 import { ContractInsert } from '../../../../db/insertInterfaces';
 import { GatewayError } from '../../../errorHandlerMiddleware';
 import { getDataItemWithoutData } from './deployContractRoute_v2';
-import { evalType } from "../../../../utils";
+import { evalType } from '../../../../utils';
 
 export async function deployBundledRoute(ctx: Router.RouterContext) {
   const { logger, dbSource, arweave, bundlr } = ctx;
@@ -29,10 +29,8 @@ export async function deployBundledRoute(ctx: Router.RouterContext) {
 
   const bundlrResponse = await bundlr.uploader.uploadTransaction(dataItem, { getReceiptSignature: true });
 
-  if (bundlrResponse.status !== 200 || !bundlrResponse.data.public || !bundlrResponse.data.signature) {
-    throw new GatewayError(
-      `Bundlr did not upload transaction correctly. Bundlr responded with status ${bundlrResponse.status}.`
-    );
+  if (!bundlrResponse.data.public || !bundlrResponse.data.signature) {
+    throw new GatewayError(`Bundlr did not upload transaction correctly.`);
   }
   logger.debug('Data item successfully bundled.', {
     id: bundlrResponse.data.id,

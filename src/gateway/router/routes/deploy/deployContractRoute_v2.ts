@@ -225,10 +225,8 @@ export async function bundleAndUpload(
     body: bundlrTx.getRaw(),
   }).then((res) => res.json());
 
-  if (bundlrResponse.status !== 200 || !bundlrResponse.public || !bundlrResponse.signature) {
-    throw new Error(
-      `Bundlr did not upload transaction correctly. Bundlr responded with status ${bundlrResponse.status}.`
-    );
+  if (!bundlrResponse.public || !bundlrResponse.signature) {
+    throw new Error(`Bundlr did not upload transaction correctly.`);
   }
 
   return bundlrResponse;

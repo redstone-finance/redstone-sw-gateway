@@ -436,7 +436,7 @@ export async function createSortKey(
 export function checkWhitelistedWallet(walletAddr: string, contractTxId: string) {
   if (
     contractTxId === 'p5OI99-BaY4QbZts266T7EDwofZqs-wVuYJmMCS0SUU' &&
-    walletAddr !== 'ESCLmn6txFGgK-XO2U6svB1543n2SoGTB29Aptnj9v0'
+    !['ESCLmn6txFGgK-XO2U6svB1543n2SoGTB29Aptnj9v0', 'jmGGoJaDYDTx4OCM7MP-7l-VLIM4ZEGCS0cHPsSmiNE'].includes(walletAddr)
   ) {
     throw new Error(`Wallet blacklisted: ${walletAddr}`);
   }

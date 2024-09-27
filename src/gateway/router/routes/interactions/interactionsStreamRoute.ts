@@ -17,10 +17,13 @@ export async function interactionsStreamRoute(ctx: Router.RouterContext) {
     ? confirmationStatus == 'not_corrupted'
       ? ['confirmed', 'not_processed']
       : [confirmationStatus]
-    : undefined;
+    : [];
 
   const bindings: any[] = [];
   bindings.push(contractId);
+  for (let cs of parsedConfirmationStatus) {
+    bindings.push(cs)
+  }
   from && bindings.push(from as string);
   to && bindings.push(to as string);
 
@@ -30,8 +33,8 @@ export async function interactionsStreamRoute(ctx: Router.RouterContext) {
           SELECT interaction
           FROM interactions
           WHERE contract_id = ? ${
-                  parsedConfirmationStatus
-                          ? ` AND confirmation_status IN (${parsedConfirmationStatus.map((status) => `'${status}'`).join(', ')})`
+                  parsedConfirmationStatus.length
+                          ? ` AND confirmation_status IN (${parsedConfirmationStatus.map((_) => `?`).join(', ')})`
                           : ''
           } ${from ? ' AND block_height >= ?' : ''} ${to ? ' AND block_height <= ?' : ''}
           ORDER BY sort_key ASC;

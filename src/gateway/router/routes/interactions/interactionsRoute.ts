@@ -19,7 +19,7 @@ export async function interactionsRoute(ctx: Router.RouterContext) {
     ? confirmationStatus == 'not_corrupted'
       ? ['confirmed', 'not_processed']
       : [confirmationStatus]
-    : undefined;
+    : [];
 
   const shouldMinimize = minimize === 'true';
 
@@ -28,6 +28,9 @@ export async function interactionsRoute(ctx: Router.RouterContext) {
   bindings.push(contractId);
   // cannot use IN with bindings https://github.com/knex/knex/issues/791
   // parsedConfirmationStatus && bindings.push(parsedConfirmationStatus)
+  for (let cs of parsedConfirmationStatus) {
+    bindings.push(cs)
+  }
   from && bindings.push(from as string);
   to && bindings.push(to as string);
   source && bindings.push(source as string);
@@ -44,8 +47,8 @@ export async function interactionsRoute(ctx: Router.RouterContext) {
         FROM interactions
         WHERE (contract_id = ? OR interact_write @> ARRAY [?])
             ${
-                    parsedConfirmationStatus
-                            ? ` AND confirmation_status IN (${parsedConfirmationStatus.map((status) => `'${status}'`).join(', ')})`
+                    parsedConfirmationStatus.length
+                            ? ` AND confirmation_status IN (${parsedConfirmationStatus.map((_) => `?`).join(', ')})`
                             : ''
             } ${from ? ' AND block_height >= ?' : ''} ${to ? ' AND block_height <= ?' : ''} ${source ? `AND source = ?` : ''} ${upToTransactionId ? `AND id <= (SELECT id FROM interactions WHERE interaction_id = ?)` : ''}
         ORDER BY block_height ${shouldMinimize ? 'ASC' : 'DESC'}, interaction_id DESC ${

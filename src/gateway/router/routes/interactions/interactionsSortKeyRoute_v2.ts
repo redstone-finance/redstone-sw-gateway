@@ -16,9 +16,9 @@ export async function interactionsSortKeyRoute_v2(ctx: Router.RouterContext) {
 
   const parsedConfirmationStatus = confirmationStatus
     ? confirmationStatus == 'not_corrupted'
-      ? undefined // ['confirmed', 'not_processed']
+      ? [] // ['confirmed', 'not_processed']
       : [confirmationStatus]
-    : undefined;
+    : [];
 
   // 'isFromSdk' means that we're making a call from the SDK
   // this affects:
@@ -31,6 +31,9 @@ export async function interactionsSortKeyRoute_v2(ctx: Router.RouterContext) {
   bindings.push(contractId);
   // cannot use IN with bindings https://github.com/knex/knex/issues/791
   // parsedConfirmationStatus && bindings.push(parsedConfirmationStatus)
+  for (let cs of parsedConfirmationStatus) {
+    bindings.push(cs)
+  }
   from && bindings.push(from as string);
   to && bindings.push(to as string);
   source && bindings.push(source as string);
@@ -46,8 +49,8 @@ export async function interactionsSortKeyRoute_v2(ctx: Router.RouterContext) {
       FROM interactions
       WHERE (contract_id = ?
           OR interact_write @> ARRAY [?]) ${
-            parsedConfirmationStatus
-              ? ` AND confirmation_status IN (${parsedConfirmationStatus.map((status) => `'${status}'`).join(', ')})`
+            parsedConfirmationStatus.length
+              ? ` AND confirmation_status IN (${parsedConfirmationStatus.map((_) => `?`).join(', ')})`
               : ''
           } ${from ? ' AND sort_key > ?' : ''} ${to ? ' AND sort_key <= ?' : ''} ${source ? `AND source = ?` : ''}
       ORDER BY sort_key ${isFromSdk ? 'ASC' : 'DESC'}

@@ -12,24 +12,25 @@ export async function joinSeason2(ctx: Router.RouterContext) {
       select interaction_id, interaction
       from interactions,
            jsonb_array_elements(interaction -> 'tags') tags
-      where contract_id = '${contractId}' and function = 'addPoints'
+      where contract_id = ? and function = 'addPoints'
         and tags ->> 'name' = 'Reward-For' and tags ->> 'value' = 'Join-Season-2'
       ),
       joined_table_res as (
           select true as joined
           from joined_table, jsonb_array_elements(interaction -> 'tags') as tags, jsonb_array_elements((tags ->> 'value')::jsonb -> 'members') as members
           where tags ->> 'name' = 'Input'
-          and members::jsonb ->> 'id' = '${userId}'
+          and members::jsonb ->> 'id' = ?
       ),
       registration_table as (
-          select '${userId}' as id, sync_timestamp as timestamp
+          select ? as id, sync_timestamp as timestamp
           from interactions,
                jsonb_array_elements(interaction -> 'tags') tags
-          where contract_id = '${contractId}' and function = 'registerUser'
+          where contract_id = ? and function = 'registerUser'
             and tags ->> 'name' = 'Input'
-            and (tags ->> 'value')::jsonb ->> 'id' = '${userId}'
+            and (tags ->> 'value')::jsonb ->> 'id' = ?
       )
-    select * from registration_table left join joined_table_res on true;`
+    select * from registration_table left join joined_table_res on true;`,
+      [contractId, userId, userId, contractId, userId]
   );
 
   const joinSeason2Result = result.rows[0];

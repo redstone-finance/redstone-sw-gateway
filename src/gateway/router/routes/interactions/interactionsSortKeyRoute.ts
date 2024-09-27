@@ -31,7 +31,7 @@ export async function interactionsSortKeyRoute(ctx: Router.RouterContext) {
   bindings.push(contractId);
   bindings.push(contractId);
   // cannot use IN with bindings https://github.com/knex/knex/issues/791
-  // parsedConfirmationStatus && bindings.push(parsedConfirmationStatus)
+  parsedConfirmationStatus && bindings.push(parsedConfirmationStatus)
   from && bindings.push(from as string);
   to && bindings.push(to as string);
   source && bindings.push(source as string);
@@ -48,9 +48,12 @@ export async function interactionsSortKeyRoute(ctx: Router.RouterContext) {
       WHERE (contract_id = ? OR interact_write @> ARRAY [?])
           ${
                   parsedConfirmationStatus
-                          ? ` AND confirmation_status IN (${parsedConfirmationStatus.map((status) => `'${status}'`).join(', ')})`
+                          ? ` AND confirmation_status IN (` + parsedConfirmationStatus.map((_) => '?').join(',') + `) `
                           : ''
-          } ${from ? ' AND sort_key > ?' : ''} ${to ? ' AND sort_key <= ?' : ''} ${source ? `AND source = ?` : ''}
+          }
+          ${from ? ' AND sort_key > ?' : ''} 
+          ${to ? ' AND sort_key <= ?' : ''} 
+          ${source ? `AND source = ?` : ''}
       ORDER BY sort_key ${shouldMinimize ? 'ASC' : 'DESC'} ${parsedPage ? ' LIMIT ? OFFSET ?' : ''};
   `;
 

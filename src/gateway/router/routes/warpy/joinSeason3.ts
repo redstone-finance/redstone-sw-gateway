@@ -17,16 +17,16 @@ export async function joinSeason3(ctx: Router.RouterContext) {
       ),
       joined_table_res as (
           select true as joined
-          from joined_table, 
-          cross join jsonb_array_elements(interaction -> 'tags') as tags, 
+          from joined_table 
+          cross join jsonb_array_elements(interaction -> 'tags') as tags
           cross join jsonb_array_elements((tags ->> 'value')::jsonb -> 'members') as members
           where tags ->> 'name' = 'Input'
           and members::jsonb ->> 'id' = ?
       ),
       registration_table as (
           select sync_timestamp 
-          from interactions, 
-          cross join jsonb_array_elements(interaction -> 'tags') tags, 
+          from interactions 
+          cross join jsonb_array_elements(interaction -> 'tags') tags 
           cross join jsonb_array_elements((tags ->> 'value')::jsonb -> 'members') as members 
           where contract_id = ? 
           and function in ('addPoints', 'addPointsForAddress', 'addPointsWithCap') 

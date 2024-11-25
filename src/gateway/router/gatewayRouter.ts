@@ -31,7 +31,7 @@ import { registerContractRoute } from './routes/deploy/registerContractRoute';
 import { dashboardRoute } from './routes/dashboardRoute';
 import { gcpAliveRoute } from './routes/gcpAliveRoute';
 import { contractsByTags } from './routes/contracts/contractsByTags';
-import { joinSeason2 } from './routes/warpy/joinSeason2';
+import { joinSeason3 } from './routes/warpy/joinSeason3';
 
 const gatewayRouter = (replica: boolean): Router => {
   const router = new Router({ prefix: '/gateway' });
@@ -64,7 +64,7 @@ const gatewayRouter = (replica: boolean): Router => {
   router.get('/gcp/alive', gcpAliveRoute);
   router.get('/sequencer/address', sequencerAddressRoute);
   router.get('/contracts-by-tags', contractsByTags);
-  router.get('/warpy/join-season-2', joinSeason2);
+  router.get('/warpy/join-season-3', joinSeason3);
 
   // post
   if (!replica) {

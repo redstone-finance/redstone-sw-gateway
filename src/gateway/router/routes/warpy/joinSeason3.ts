@@ -1,7 +1,7 @@
 import Router from '@koa/router';
 import { Benchmark } from 'warp-contracts';
 
-export async function joinSeason2(ctx: Router.RouterContext) {
+export async function joinSeason3(ctx: Router.RouterContext) {
   const { logger, dbSource } = ctx;
 
   const { contractId, userId } = ctx.query;
@@ -13,7 +13,7 @@ export async function joinSeason2(ctx: Router.RouterContext) {
       from interactions,
            jsonb_array_elements(interaction -> 'tags') tags
       where contract_id = '${contractId}' and function = 'addPoints'
-        and tags ->> 'name' = 'Reward-For' and tags ->> 'value' = 'Join-Season-2'
+        and tags ->> 'name' = 'Reward-For' and tags ->> 'value' = 'Join-Season-3'
       ),
       joined_table_res as (
           select true as joined
@@ -32,11 +32,11 @@ export async function joinSeason2(ctx: Router.RouterContext) {
     select * from registration_table left join joined_table_res on true;`
   );
 
-  const joinSeason2Result = result.rows[0];
+  const joinSeason3Result = result.rows[0];
   ctx.body = {
-    id: joinSeason2Result?.id,
-    joined: joinSeason2Result?.joined,
-    timestamp: joinSeason2Result?.timestamp,
+    id: joinSeason3Result?.id,
+    joined: joinSeason3Result?.joined,
+    timestamp: joinSeason3Result?.timestamp,
   };
 
   logger.debug(`User's registration date loaded in ${benchmark.elapsed()}`);

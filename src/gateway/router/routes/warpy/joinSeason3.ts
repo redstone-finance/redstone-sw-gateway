@@ -24,7 +24,7 @@ export async function joinSeason3(ctx: Router.RouterContext) {
           and members::jsonb ->> 'id' = ?
       ),
       registration_table as (
-          select sync_timestamp 
+          select sync_timestamp as timestamp 
           from interactions 
           cross join jsonb_array_elements(interaction -> 'tags') tags 
           cross join jsonb_array_elements((tags ->> 'value')::jsonb -> 'members') as members 

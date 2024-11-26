@@ -23,7 +23,6 @@ export async function joinSeason3(ctx: Router.RouterContext) {
           where tags ->> 'name' = 'Input'
           and members::jsonb ->> 'id' = ?
           limit 1
-          
       ),
       registration_table as (
           select sync_timestamp as timestamp 
@@ -36,7 +35,11 @@ export async function joinSeason3(ctx: Router.RouterContext) {
           and (members ->> 'id' = ? or members ->> 'id' = ?) 
           and sync_timestamp between 1719871200000 and 1732575600000 limit 1
       )
-    select * from joined_table_res left join registration_table on true;`,
+      select coalesce(joined_table_res.joined, false) as joined,
+      registration_table.timestamp
+      from joined_table_res
+      full outer join registration_table on true;
+`,
     [contractId, userId, contractId, userId, walletAddress]
   );
 
